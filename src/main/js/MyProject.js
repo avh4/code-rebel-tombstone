@@ -4,22 +4,25 @@
 
 var React = require('react');
 var ReactFireMixin = require('reactfire');
+var TaskList = require('./TaskList');
 
 module.exports = React.createClass({
-  mixins: [ReactFireMixin],
   getInitialState: function() {
-    return { tasks: [] };
+    return { screen: 'tasks' };
   },
-  componentWillMount: function() {
-    this.bindAsArray(new Firebase('https://rebel-tombstone-dev.firebaseio.com/tasks'), 'tasks');
+  doSwitchToProjects: function() {
+    this.setState({ screen: 'projects' });
+  },
+  doSwitchToTasks: function() {
+    this.setState({ screen: 'tasks'});
   },
   render: function() {
-    var list = this.state.tasks.map(function(task) {
-      return <li className="list-group-item">{task.description}</li>;
-    })
     return <div>
-      <h2>Tasks</h2>
-      <ul className="list-group">{list}</ul>
+      <ul className="nav nav-tabs" role="tablist">
+        <li className={this.state.screen === 'tasks' ? 'active' : null}><a href="#" onClick={this.doSwitchToTasks}>Tasks</a></li>
+        <li className={this.state.screen === 'projects' ? 'active' : null}><a href="#" onClick={this.doSwitchToProjects}>Projects</a></li>
+      </ul>
+      { this.state.screen === 'tasks' ? <TaskList/> : null}
     </div>;
   }
 });
