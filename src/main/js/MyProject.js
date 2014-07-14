@@ -5,6 +5,7 @@
 var React = require('react');
 var ReactFireMixin = require('reactfire');
 var TaskList = require('./TaskList');
+var ProjectList = require('./ProjectList');
 
 module.exports = React.createClass({
   getInitialState: function() {
@@ -22,7 +23,7 @@ module.exports = React.createClass({
         <li className={this.state.screen === 'tasks' ? 'active' : null}><a href="#" onClick={this.doSwitchToTasks}>Tasks</a></li>
         <li className={this.state.screen === 'projects' ? 'active' : null}><a href="#" onClick={this.doSwitchToProjects}>Projects</a></li>
       </ul>
-      { this.state.screen === 'tasks' ? <TaskList/> : null}
+      { this.state.screen === 'tasks' ? <TaskList/> : <ProjectList/>}
     </div>;
   }
 });
