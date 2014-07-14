@@ -16,11 +16,11 @@ module.exports = React.createClass({
   },
   render: function() {
     var list = this.state.actions.map(function(action) {
-      return <li>{action.description}</li>;
+      return <li className="list-group-item">{action.description}</li>;
     })
     return <div>
-      <Label>MyProject</Label>
-      <ul>{list}</ul>
+      <h2>Tasks</h2>
+      <ul className="list-group">{list}</ul>
     </div>;
   }
 });
