@@ -78,7 +78,7 @@ module.exports = React.createClass({
   },
   render: function() {
     var message = "It's clean!";
-    if (this.state.inbox.length == 0) return <div>{message}</div>;
+    if (this.state.inbox.length == 0) return <div className="jumbotron"><h1>{message}</h1></div>;
     
     return <div>
       <ProcessCard/>
