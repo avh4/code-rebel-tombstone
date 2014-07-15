@@ -8,14 +8,17 @@ var ReactFireMixin = require('reactfire');
 module.exports = React.createClass({
   mixins: [ReactFireMixin],
   getInitialState: function() {
-    return { tasks: [] };
+    return { projects: [] };
   },
   componentWillMount: function() {
-    this.bindAsArray(new Firebase('https://rebel-tombstone-dev.firebaseio.com/tasks'), 'tasks');
+    this.bindAsArray(new Firebase('https://rebel-tombstone-dev.firebaseio.com/projects'), 'projects');
   },
   render: function() {
-    var list = this.state.tasks.map(function(task) {
-      return <li className="list-group-item">{task.description}</li>;
+    var list = [];
+    this.state.projects.forEach(function(project) {
+      project.tasks.forEach(function(task) {
+        list.push(<li className="list-group-item">{task.description}</li>);
+      });
     });
     return <ul className="list-group">{list}</ul>;
   }
