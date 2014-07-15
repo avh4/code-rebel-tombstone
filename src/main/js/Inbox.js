@@ -25,7 +25,14 @@ module.exports = React.createClass({
   doSubmit: function() {
     var item = this.state.inbox[0];
     var p = this.refs.project.value();
-    var newTask = this.firebaseRefs.projects.child(p.id).child('tasks').push();
+    var projectRef;
+    if (p) {
+      projectRef = this.firebaseRefs.projects.child(p.id);
+    } else {
+      projectRef = this.firebaseRefs.projects.push();
+      projectRef.set({title: this.refs.project.text()});
+    }
+    var newTask = projectRef.child('tasks').push();
     newTask.set(item, function(error) {
       if (error) alert(error);
       else {

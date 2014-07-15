@@ -30,6 +30,9 @@ module.exports = React.createClass({
   value: function() {
     return this._v;
   },
+  text: function() {
+    return this.refs.input.getDOMNode().value;
+  },
   render: function() {
     return <input ref="input" className="form-control" type="text" placeholder={this.props.placeholder}/>;
   }
