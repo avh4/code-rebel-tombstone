@@ -5,6 +5,8 @@
 var React = require('react');
 var ReactFireMixin = require('reactfire');
 
+var TaskListItem = require('./TaskListItem');
+
 module.exports = React.createClass({
   mixins: [ReactFireMixin],
   getInitialState: function() {
@@ -13,17 +15,13 @@ module.exports = React.createClass({
   componentWillMount: function() {
     this.bindAsArray(new Firebase('https://rebel-tombstone-dev.firebaseio.com/projects'), 'projects');
   },
-  doCheckItem: function(projectSnap, taskSnap, prev) {
-    this.firebaseRefs.projects.child(projectSnap.name()).child('tasks').child(taskSnap.name()).child('completed').set(!prev);
-  },
   render: function() {
     var list = [];
     if (this.state.projectsSnap) {
       this.state.projectsSnap.forEach(function(p) {
         p.child('tasks').forEach(function(t) {
-          var task = t.val();
-          list.push(<li className="list-group-item">
-          <input type="checkbox" checked={task.completed} onChange={this.doCheckItem.bind(null, p, t, task.completed)}/> {task.description}</li>);
+          var taskRef = this.firebaseRefs.projects.child(p.name()).child('tasks').child(t.name());
+          list.push(<TaskListItem key={p.name() + '.' + t.name()} task={t.val()} taskRef={taskRef}/>);
         }.bind(this));
       }.bind(this));
     }
