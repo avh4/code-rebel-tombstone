@@ -13,13 +13,20 @@ module.exports = React.createClass({
   componentWillMount: function() {
     this.bindAsArray(new Firebase('https://rebel-tombstone-dev.firebaseio.com/projects'), 'projects');
   },
+  doCheckItem: function(task) {
+    // task.completed = true;
+  },
   render: function() {
     var list = [];
-    this.state.projects.forEach(function(project) {
-      project.tasks.forEach(function(task) {
-        list.push(<li className="list-group-item">{task.description}</li>);
-      });
-    });
+    if (this.state.projectsSnap) {
+      this.state.projectsSnap.forEach(function(p) {
+        p.child('tasks').forEach(function(t) {
+          var task = t.val();
+          list.push(<li className="list-group-item">
+          <input type="checkbox" onChange={this.doCheckItem.bind(null, task)}/> {task.description}</li>);
+        }.bind(this));
+      }.bind(this));
+    }
     return <ul className="list-group">{list}</ul>;
   }
 });

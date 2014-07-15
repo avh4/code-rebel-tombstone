@@ -14,14 +14,18 @@ module.exports = React.createClass({
     this.bindAsArray(new Firebase('https://rebel-tombstone-dev.firebaseio.com/projects'), 'projects');
   },
   render: function() {
-    var projects = this.state.projects.map(function(project) {
-      var list = project.tasks.map(function(task) {
-        return <li className="list-group-item">{task.description}</li>;
+    var projects = [];
+    if (!this.state.projectsSnap) return <div/>;
+    this.state.projectsSnap.forEach(function(p) {
+      var list = [];
+      p.child('tasks').forEach(function(t) {
+        var task = t.val();
+        list.push(<li className="list-group-item">{task.description}</li>);
       });
-      return <div>
-        <h2>{project.title}</h2>
+      projects.push(<div>
+        <h2>{p.val().title}</h2>
         <ul className="list-group">{list}</ul>
-      </div>;
+      </div>)
     });
     return <div>{projects}</div>;
   }
