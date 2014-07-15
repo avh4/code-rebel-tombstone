@@ -5,7 +5,7 @@
 var React = require('react');
 
 module.exports = React.createClass({
-  componentDidMount: function() {
+  initTypeahead: function() {
     var source = new Bloodhound({
       datumTokenizer: Bloodhound.tokenizers.obj.whitespace(this.props.displayKey),
       queryTokenizer: Bloodhound.tokenizers.whitespace,
@@ -13,6 +13,7 @@ module.exports = React.createClass({
     });
     source.initialize();
     
+    $(this.getDOMNode()).typeahead('destroy');
     $(this.getDOMNode()).typeahead({
       hint: true,
       highlight: true,
@@ -26,6 +27,12 @@ module.exports = React.createClass({
     }.bind(this)).on('typeahead:autocompleted', function (obj, datum) {
       this._v = datum;
     }.bind(this));
+  },
+  componentDidMount: function() {
+    this.initTypeahead();
+  },
+  componentDidUpdate: function() {
+    this.initTypeahead();
   },
   value: function() {
     return this._v;
