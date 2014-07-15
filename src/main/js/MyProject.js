@@ -6,6 +6,7 @@ var React = require('react');
 var ReactFireMixin = require('reactfire');
 var TaskList = require('./TaskList');
 var ProjectList = require('./ProjectList');
+var Inbox = require('./Inbox');
 
 module.exports = React.createClass({
   getInitialState: function() {
@@ -17,13 +18,25 @@ module.exports = React.createClass({
   doSwitchToTasks: function() {
     this.setState({ screen: 'tasks'});
   },
+  doSwitchToInbox: function() {
+    this.setState({ screen: 'inbox'});
+  },
   render: function() {
+    var tab;
+    if (this.state.screen === 'tasks') {
+      tab = <TaskList/>;
+    } else if (this.state.screen === 'projects') {
+      tab = <ProjectList/>;
+    } else if (this.state.screen === 'inbox') {
+      tab = <Inbox/>;
+    }
     return <div>
       <ul className="nav nav-tabs" role="tablist">
         <li className={this.state.screen === 'tasks' ? 'active' : null}><a href="#" onClick={this.doSwitchToTasks}>Tasks</a></li>
         <li className={this.state.screen === 'projects' ? 'active' : null}><a href="#" onClick={this.doSwitchToProjects}>Projects</a></li>
+        <li className={this.state.screen === 'inbox' ? 'active' : null}><a href="#" onClick={this.doSwitchToInbox}>Inbox</a></li>
       </ul>
-      { this.state.screen === 'tasks' ? <TaskList/> : <ProjectList/>}
+      {tab}
     </div>;
   }
 });
