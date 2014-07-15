@@ -32,6 +32,7 @@ module.exports = React.createClass({
         this.firebaseRefs.inbox.child(this.state.next.name()).remove();
       }
     }.bind(this));
+    return false;
   },
   render: function() {
     var projects = [];
@@ -42,7 +43,7 @@ module.exports = React.createClass({
     }
 
     var list = [];
-    if (!this.state.next) return <div/>;
+    if (this.state.inbox.length <= 0) return <div>It's clean!</div>;
     return <div>
       <div className="panel panel-default">
         <div className="panel-heading">
