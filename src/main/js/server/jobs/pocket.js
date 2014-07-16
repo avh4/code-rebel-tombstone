@@ -13,7 +13,7 @@ function objFor(obj, fn) {
 var getPocket = function(consumer_key, access_token, since) {
   var p = q.defer();
   var r = request.post('https://getpocket.com/v3/get')
-  .send({consumer_key: consumer_key, access_token: access_token});
+  .send({consumer_key: consumer_key, access_token: access_token, state: 'all'});
   if (since) {
     r = r.send({since: since});
   }
@@ -25,15 +25,16 @@ var getPocket = function(consumer_key, access_token, since) {
     // var todo = [];
     // var promises = [];
     objFor(res.body.list, function(id, item) {
-      inboxRef.child('pocket:' + item.item_id).set({
-        description: item.resolved_title || item.given_title || item.given_url,
-        type: 'pocket',
-        href: item.resolved_url || item.given_url,
-        notes: item.excerpt
-      }, function(error) {
-        // if (error) p.reject(error);
-        // else p.resolve();
-      });
+      if (item.status === '0') {
+        inboxRef.child('pocket:' + item.item_id).set({
+          description: item.resolved_title || item.given_title || item.given_url,
+          type: 'pocket',
+          href: item.resolved_url || item.given_url,
+          notes: item.excerpt
+        });
+      } else {
+        inboxRef.child('pocket:' + item.item_id).remove();
+      }
       
       
       // if (!item) console.log("XXX", id);
