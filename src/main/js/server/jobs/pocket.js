@@ -26,7 +26,10 @@ var getPocket = function(consumer_key, access_token, since) {
     // var promises = [];
     objFor(res.body.list, function(id, item) {
       inboxRef.child('pocket:' + item.item_id).set({
-        description: item.resolved_title || item.given_title || item.given_url
+        description: item.resolved_title || item.given_title || item.given_url,
+        type: 'pocket',
+        href: item.resolved_url || item.given_url,
+        notes: item.excerpt
       }, function(error) {
         // if (error) p.reject(error);
         // else p.resolve();

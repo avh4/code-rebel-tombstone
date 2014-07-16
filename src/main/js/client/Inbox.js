@@ -45,20 +45,29 @@ var ProcessCard = React.createClass({
   render: function() {
     var projects = [];
     if (this.state.projectsSnap) {
-      console.log(this.state.projectsSnap.numChildren());
       this.state.projectsSnap.forEach(function(p) {
-        console.log(p.val());
         projects.push({ title: p.val().title, id: p.name() });
       });
     }
     
     if (!this.state.next) return <div>...</div>;
+    
+    var next = this.state.next.val();
+    var title = next.description;
+    if (next.href) {
+      title = <a href={next.href} target="_new">{next.description}</a>;
+    }
+    var icons = [];
+    if (next.type === 'pocket') {
+      icons.push(<img src="pocket.png" width="16"/>)
+    }
 
     return <div className="panel panel-default">
       <div className="panel-heading">
-        <h3 className="panel-title">{this.state.next.val().description}</h3>
+        <h3 className="panel-title">{icons} {title}</h3>
       </div>
       <div className="panel-body">
+        <p>{next.notes}</p>
         <form onSubmit={this.doSubmit}>
           <Typeahead ref="project" placeholder="Project" options={projects} displayKey="title"/>
           <button className="btn btn-primary">Make Action</button>
