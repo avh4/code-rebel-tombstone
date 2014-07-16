@@ -80,13 +80,14 @@ var ProcessCard = React.createClass({
 module.exports = React.createClass({
   mixins: [ReactFireMixin],
   getInitialState: function() {
-    return { inbox: [] };
+    return { inbox: null };
   },
   componentWillMount: function() {
     this.bindAsArray(new Firebase('https://rebel-tombstone-dev.firebaseio.com/inbox'), 'inbox');
   },
   render: function() {
     var message = "It's clean!";
+    if (!this.state.inbox) return <div><ProcessCard/></div>;
     if (this.state.inbox.length == 0) return <div className="jumbotron"><h1>{message}</h1></div>;
     
     return <div>
