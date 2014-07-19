@@ -4,23 +4,25 @@
 
 var React = require('react');
 var zzy = require('./engine');
+var TaskList = require('./TaskList');
 
 module.exports = React.createClass({
   getInitialState: function() {
-    return { tasks: [] };
+    return { screen: 'tasks' };
   },
-  componentWillMount: function() {
-    zzy.subscribe('tasks', function(tasks) {
-      this.setState({tasks: tasks || []});
-    }.bind(this));
+  doSwitchToProjects: function() {
+    this.setState({ screen: 'projects' });
+  },
+  doSwitchToTasks: function() {
+    this.setState({ screen: 'tasks'});
   },
   render: function() {
-    var list = this.state.tasks.toArray().map(function(task) {
-      return <li className="list-group-item">{task.description}</li>;
-    })
     return <div>
-      <h2>Tasks</h2>
-      <ul className="list-group">{list}</ul>
+      <ul className="nav nav-tabs" role="tablist">
+        <li className={this.state.screen === 'tasks' ? 'active' : null}><a href="#" onClick={this.doSwitchToTasks}>Tasks</a></li>
+        <li className={this.state.screen === 'projects' ? 'active' : null}><a href="#" onClick={this.doSwitchToProjects}>Projects</a></li>
+      </ul>
+      { this.state.screen === 'tasks' ? <TaskList/> : null}
     </div>;
   }
 });
