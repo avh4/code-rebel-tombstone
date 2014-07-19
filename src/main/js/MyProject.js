@@ -3,25 +3,24 @@
 "use strict";
 
 var React = require('react');
-var Label = require('./Label');
 var zzy = require('./engine');
 
 module.exports = React.createClass({
   getInitialState: function() {
-    return { actions: [] };
+    return { tasks: [] };
   },
   componentWillMount: function() {
-    zzy.subscribe('actions', function(actions) {
-      this.setState({actions: actions || []});
+    zzy.subscribe('tasks', function(tasks) {
+      this.setState({tasks: tasks || []});
     }.bind(this));
   },
   render: function() {
-    var list = this.state.actions.toArray().map(function(action) {
-      return <li>{action.description}</li>;
+    var list = this.state.tasks.toArray().map(function(task) {
+      return <li className="list-group-item">{task.description}</li>;
     })
     return <div>
-      <Label>MyProject</Label>
-      <ul>{list}</ul>
+      <h2>Tasks</h2>
+      <ul className="list-group">{list}</ul>
     </div>;
   }
 });
