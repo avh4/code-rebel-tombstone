@@ -11,7 +11,6 @@ var ProcessCard = React.createClass({
     return { projects: [], next: undefined };
   },
   componentWillMount: function() {
-    this.firebaseRefs = { projects: new Firebase('https://rebel-tombstone-dev.firebaseio.com/projects') };
     dao.bindProjects(function(projects) {
       this.setState({ projectsSnap: projects});
     }.bind(this));
@@ -20,22 +19,8 @@ var ProcessCard = React.createClass({
     }.bind(this));
   },
   doSubmit: function() {
-    var item = this.state.next.val();
     var p = this.refs.project.value();
-    var projectRef;
-    if (p) {
-      projectRef = this.firebaseRefs.projects.child(p.id);
-    } else {
-      projectRef = this.firebaseRefs.projects.push();
-      projectRef.set({title: this.refs.project.text()});
-    }
-    var newTask = projectRef.child('tasks').push();
-    newTask.set(item, function(error) {
-      if (error) alert(error);
-      else {
-        new Firebase('https://rebel-tombstone-dev.firebaseio.com/inbox').child(this.state.next.name()).remove();
-      }
-    }.bind(this));
+    dao.doMakeTaskFromInboxItem(this.state.next, p || this.refs.project.text());
     return false;
   },
   render: function() {

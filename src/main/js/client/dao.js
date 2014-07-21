@@ -18,6 +18,25 @@ var dao = {
         fn(inboxItemSnap);
       });
     });
+  },
+  doMakeTaskFromInboxItem: function(inboxItemSnap, projectOrName) {
+    var projectsRef = new Firebase('https://rebel-tombstone-dev.firebaseio.com/projects');
+    var inboxRef = new Firebase('https://rebel-tombstone-dev.firebaseio.com/inbox');
+    var item = inboxItemSnap.val();
+    var projectRef;
+    if (typeof projectOrName === 'string') {
+      projectRef = projectsRef.push();
+      projectRef.set({title: projectOrName});
+    } else {
+      projectRef = projectsRef.child(projectOrName.id);
+    }
+    var newTask = projectRef.child('tasks').push();
+    newTask.set(item, function(error) {
+      if (error) alert(error);
+      else {
+        inboxRef.child(inboxItemSnap.name()).remove();
+      }
+    });
   }
 };
 
