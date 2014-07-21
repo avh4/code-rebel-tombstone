@@ -3,24 +3,20 @@
 "use strict";
 
 var React = require('react');
-var ReactFireMixin = require('reactfire');
-
 var Typeahead = require('./Typeahead');
+var dao = require('./dao');
 
 var ProcessCard = React.createClass({
-  mixins: [ReactFireMixin],
   getInitialState: function() {
     return { projects: [], next: undefined };
   },
   componentWillMount: function() {
-    this.bindAsArray(new Firebase('https://rebel-tombstone-dev.firebaseio.com/projects'), 'projects');
-    
-    this.inbox = new Firebase('https://rebel-tombstone-dev.firebaseio.com/inbox');
-    
-    this.inbox.startAt().limit(1).on('value', function(v) {
-      v.forEach(function(c) {
-        this.setState({ next: c });
-      }.bind(this));
+    this.firebaseRefs = { projects: new Firebase('https://rebel-tombstone-dev.firebaseio.com/projects') };
+    dao.bindProjects(function(projects) {
+      this.setState({ projectsSnap: projects});
+    }.bind(this));
+    dao.bindNextInboxItem(function(inboxItem) {
+      this.setState({ next: inboxItem });
     }.bind(this));
   },
   doSubmit: function() {
@@ -37,7 +33,7 @@ var ProcessCard = React.createClass({
     newTask.set(item, function(error) {
       if (error) alert(error);
       else {
-        this.inbox.child(this.state.next.name()).remove();
+        new Firebase('https://rebel-tombstone-dev.firebaseio.com/inbox').child(this.state.next.name()).remove();
       }
     }.bind(this));
     return false;
@@ -78,21 +74,22 @@ var ProcessCard = React.createClass({
 });
 
 module.exports = React.createClass({
-  mixins: [ReactFireMixin],
   getInitialState: function() {
-    return { inbox: null };
+    return { inboxCount: null };
   },
   componentWillMount: function() {
-    this.bindAsArray(new Firebase('https://rebel-tombstone-dev.firebaseio.com/inbox'), 'inbox');
+    dao.bindInboxCount(function(count) {
+      this.setState({ inboxCount: count });
+    }.bind(this));
   },
   render: function() {
     var message = "It's clean!";
-    if (!this.state.inbox) return <div><ProcessCard/></div>;
-    if (this.state.inbox.length == 0) return <div className="jumbotron"><h1>{message}</h1></div>;
+    if (this.state.inboxCount == null) return <div><ProcessCard/></div>;
+    if (this.state.inboxCount == 0) return <div className="jumbotron"><h1>{message}</h1></div>;
     
     return <div>
       <ProcessCard/>
-      <p>{this.state.inbox.length - 1} more</p>
+      <p>{this.state.inboxCount - 1} more</p>
     </div>;
   }
 })
