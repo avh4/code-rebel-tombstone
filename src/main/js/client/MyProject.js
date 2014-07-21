@@ -3,7 +3,6 @@
 "use strict";
 
 var React = require('react');
-var ReactFireMixin = require('reactfire');
 var TaskList = require('./TaskList');
 var ProjectList = require('./ProjectList');
 var Inbox = require('./Inbox');
