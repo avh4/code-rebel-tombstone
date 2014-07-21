@@ -25,7 +25,6 @@
   "dependencies": {
     "moment": "^2.7.0",
     "q": "^1.0.1",
-    "reactfire": "^0.1.6",
     "superagent": "^0.18.2"
   }
 }
