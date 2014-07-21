@@ -37,6 +37,15 @@ var dao = {
         inboxRef.child(inboxItemSnap.name()).remove();
       }
     });
+  },
+  getTaskRef: function(projectId, taskId) {
+    var projectsRef = new Firebase('https://rebel-tombstone-dev.firebaseio.com/projects');
+    return {
+      doComplete: function(b) {
+        var taskRef = projectsRef.child(projectId).child('tasks').child(taskId);
+        taskRef.child('completed').set(b);
+      }
+    };
   }
 };
 

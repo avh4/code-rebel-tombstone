@@ -6,7 +6,7 @@ var React = require('react');
 
 module.exports = React.createClass({
   doCheckItem: function(prev) {
-    this.props.taskRef.child('completed').set(!prev);
+    this.props.taskRef.doComplete(!prev);
   },
   render: function() {
     var task = this.props.task;
