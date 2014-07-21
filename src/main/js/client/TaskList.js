@@ -4,17 +4,16 @@
 
 var React = require('react');
 var dao = require('./dao');
-var ReactFireMixin = require('reactfire');
-
 var TaskListItem = require('./TaskListItem');
 
 module.exports = React.createClass({
-  mixins: [ReactFireMixin],
   getInitialState: function() {
     return { projects: [] };
   },
   componentWillMount: function() {
-    this.bindAsArray(new Firebase('https://rebel-tombstone-dev.firebaseio.com/projects'), 'projects');
+    dao.bindProjects(function(projects) {
+      this.setState({ projectsSnap: projects});
+    }.bind(this));
   },
   render: function() {
     var list = [];
