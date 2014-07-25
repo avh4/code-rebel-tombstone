@@ -1,15 +1,10 @@
 var q = require('q');
 var Firebase = require('firebase');
 var request = require('superagent');
-
-var configRef = new Firebase('https://rebel-tombstone-dev.firebaseio.com/integrations/pocket/aaa');
+var dao = require('../../dao');
 
 function getConfig() {
-  var p = q.defer();
-  configRef.once('value', function(config) {
-    p.resolve(config.val());
-  });
-  return p.promise;
+  return dao.pocket.getConfig();
 }
 
 var request_token = function(redirect_uri) {

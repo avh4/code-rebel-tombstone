@@ -1,8 +1,21 @@
+var q = require('q');
 
 function dao(ref) {
   this.ref = ref;
   this.projectsRef = ref.child('projects');
   this.inboxRef = ref.child('inbox');
+
+  var configRef = ref.child('integrations/pocket/aaa');
+
+  this.pocket = {
+    getConfig: function() {
+      var p = q.defer();
+      configRef.once('value', function(config) {
+        p.resolve(config.val());
+      });
+      return p.promise;
+    }
+  }
 }
 
 dao.prototype.bindProjects = function(fn) {
