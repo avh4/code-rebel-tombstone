@@ -3,5 +3,9 @@
 var pocket = require('./service');
 
 module.exports = function(job) {
-  return pocket.archive(job.pocket__item_id);
+  if (job.completed) {
+    return pocket.archive(job.pocket__item_id);
+  } else {
+    return pocket.readd(job.pocket__item_id);
+  }
 }

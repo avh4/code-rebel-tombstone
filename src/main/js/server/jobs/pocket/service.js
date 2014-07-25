@@ -41,6 +41,22 @@ var auth_token = function(redirect_uri, request_token) {
   });
 };
 
+function modify(action, item_id) {
+  return getConfig().then(function(config) {
+    var p = q.defer();
+    var consumer_key = config.consumer_key;
+    var access_token = config.access_token;
+    var r = request.post('https://getpocket.com/v3/send')
+    .send({consumer_key: consumer_key, access_token: access_token, actions: [
+      { "action": action, "item_id": item_id }
+      ]});
+    r.end(function(err, res) {
+      p.resolve();
+    });
+    return p.promise;
+  });
+}
+
 module.exports = {
   auth: function(redirect_uri, user_step) {
     var req_token;
@@ -52,18 +68,9 @@ module.exports = {
     });
   },
   archive: function(item_id) {
-    return getConfig().then(function(config) {
-      var p = q.defer();
-      var consumer_key = config.consumer_key;
-      var access_token = config.access_token;
-      var r = request.post('https://getpocket.com/v3/send')
-      .send({consumer_key: consumer_key, access_token: access_token, actions: [
-        { "action": "archive", "item_id": item_id }
-        ]});
-      r.end(function(err, res) {
-        p.resolve();
-      });
-      return p.promise;
-    });
+    return modify('archive', item_id);
+  },
+  readd: function(item_id) {
+    return modify('readd', item_id);
   }
 };
