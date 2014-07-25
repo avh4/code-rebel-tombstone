@@ -23,6 +23,10 @@ var ProcessCard = React.createClass({
     dao.doMakeTaskFromInboxItem(this.state.next, p || this.refs.project.text());
     return false;
   },
+  doDone: function() {
+    dao.doCompleteInbox(this.state.next);
+    return false;
+  },
   render: function() {
     var projects = [];
     if (this.state.projectsSnap) {
@@ -52,6 +56,7 @@ var ProcessCard = React.createClass({
         <form onSubmit={this.doSubmit}>
           <Typeahead ref="project" placeholder="Project" options={projects} displayKey="title"/>
           <button className="btn btn-primary">Make Action</button>
+          <button className="btn btn-default" onClick={this.doDone}>Done</button>
         </form>
       </div>
     </div>;

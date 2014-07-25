@@ -4,6 +4,7 @@ function dao(ref) {
   this.ref = ref;
   this.projectsRef = ref.child('projects');
   this.inboxRef = ref.child('inbox');
+  this.completionsRef = this.ref.child('jobs').child('completions');
 
   var configRef = ref.child('integrations/pocket/aaa');
 
@@ -57,7 +58,7 @@ dao.prototype.doMakeTaskFromInboxItem = function(inboxItemSnap, projectOrName) {
 };
 
 dao.prototype.getTaskRef = function(projectId, taskId) {
-  var completionsRef = this.ref.child('jobs').child('completions');
+  var completionsRef = this.completionsRef;
   return {
     doComplete: function(b) {
       var taskRef = this.projectsRef.child(projectId).child('tasks').child(taskId);
@@ -71,6 +72,16 @@ dao.prototype.getTaskRef = function(projectId, taskId) {
       });
     }.bind(this)
   };
+};
+
+dao.prototype.doCompleteInbox = function(inboxSnap) {
+  var pocketId = inboxSnap.child('pocket__item_id').val();
+  if (pocketId) {
+    var val = inboxSnap.val();
+    val.completed = true;
+    this.completionsRef.child('pocket').child('pocket:' + pocketId).set(val);
+  }
+  inboxSnap.ref().remove();
 };
 
 module.exports = dao;
