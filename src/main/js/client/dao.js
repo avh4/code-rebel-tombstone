@@ -39,11 +39,19 @@ var dao = {
     });
   },
   getTaskRef: function(projectId, taskId) {
+    var completionsRef = new Firebase('https://rebel-tombstone-dev.firebaseio.com/jobs/completions');
     var projectsRef = new Firebase('https://rebel-tombstone-dev.firebaseio.com/projects');
     return {
       doComplete: function(b) {
         var taskRef = projectsRef.child(projectId).child('tasks').child(taskId);
-        taskRef.child('completed').set(b);
+        taskRef.child('completed').set(b, function() {
+          taskRef.once('value', function(taskSnap) {
+            var pocketId = taskSnap.child('pocket__item_id').val();
+            if (pocketId) {
+              completionsRef.child('pocket').child('pocket:' + pocketId).set(taskSnap.val());
+            }
+          });
+        });
       }
     };
   }

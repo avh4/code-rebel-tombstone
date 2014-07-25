@@ -30,7 +30,8 @@ var getPocket = function(consumer_key, access_token, since) {
           description: item.resolved_title || item.given_title || item.given_url,
           type: 'pocket',
           href: item.resolved_url || item.given_url,
-          notes: item.excerpt
+          notes: item.excerpt,
+          pocket__item_id: item.item_id
         });
       } else {
         inboxRef.child('pocket:' + item.item_id).remove();
