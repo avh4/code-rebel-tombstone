@@ -1,41 +1,46 @@
-/** @jsx React.DOM */
-
 "use strict";
 
-var React = require('react');
+var m = require('mithril');
 var TaskList = require('./TaskList');
 var ProjectList = require('./ProjectList');
 var Inbox = require('./Inbox');
 
-module.exports = React.createClass({
-  getInitialState: function() {
-    return { screen: 'tasks' };
+module.exports = {
+  controller: function() {
+    this.screen = m.prop('tasks');
+    this.TaskList = new TaskList.controller();
+    this.ProjectList = new ProjectList.controller();
+    this.Inbox = new Inbox.controller();
+    this.switchToTasks = function() {
+      this.screen('tasks');
+    }.bind(this);
+    this.switchToProjects = function() {
+      this.screen('projects');
+    }.bind(this);
+    this.switchToInbox = function() {
+      this.screen('inbox');
+    }.bind(this);
   },
-  doSwitchToProjects: function() {
-    this.setState({ screen: 'projects' });
-  },
-  doSwitchToTasks: function() {
-    this.setState({ screen: 'tasks'});
-  },
-  doSwitchToInbox: function() {
-    this.setState({ screen: 'inbox'});
-  },
-  render: function() {
+  view: function(ctrl) {
+    var screen = ctrl.screen();
+    var is = {
+      tasks: screen === 'tasks',
+      projects: screen === 'projects',
+      inbox: screen === 'inbox'
+    };
     var tab;
-    if (this.state.screen === 'tasks') {
-      tab = <TaskList/>;
-    } else if (this.state.screen === 'projects') {
-      tab = <ProjectList/>;
-    } else if (this.state.screen === 'inbox') {
-      tab = <Inbox/>;
+    if (is.tasks) {
+      tab = TaskList.view(ctrl.TaskList);
+    } else if (is.projects) {
+      tab = ProjectList.view(ctrl.ProjectList);
+    } else if (is.inbox) {
+      tab = Inbox.view(ctrl.Inbox);
     }
-    return <div>
-      <ul className="nav nav-tabs" role="tablist">
-        <li className={this.state.screen === 'tasks' ? 'active' : null}><a href="#" onClick={this.doSwitchToTasks}>Tasks</a></li>
-        <li className={this.state.screen === 'projects' ? 'active' : null}><a href="#" onClick={this.doSwitchToProjects}>Projects</a></li>
-        <li className={this.state.screen === 'inbox' ? 'active' : null}><a href="#" onClick={this.doSwitchToInbox}>Inbox</a></li>
-      </ul>
-      {tab}
-    </div>;
+    return m('div', [
+      m('ul.nav.nav-tabs', { role: 'tablist'}, [
+        m(is.tasks ? 'li.active' : 'li', m('a', { href: '#', onclick: ctrl.switchToTasks }, 'Tasks')),
+        m(is.projects ? 'li.active' : 'li', m('a', { onclick: ctrl.switchToProjects }, 'Projects')),
+        m(is.inbox ? 'li.active' : 'li', m('a', {onclick: ctrl.switchToInbox }, 'Inbox'))
+      ]), tab]);
   }
-});
+}

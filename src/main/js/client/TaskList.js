@@ -1,30 +1,27 @@
-/** @jsx React.DOM */
-
 "use strict";
 
-var React = require('react');
+var m = require('mithril');
 var dao = require('./dao');
 var TaskListItem = require('./TaskListItem');
 
-module.exports = React.createClass({
-  getInitialState: function() {
-    return { projects: [] };
-  },
-  componentWillMount: function() {
+module.exports = {
+  controller: function() {
+    this.projectsSnap = m.prop();
     dao.bindProjects(function(projects) {
-      this.setState({ projectsSnap: projects});
+      this.projectsSnap(projects);
+      m.redraw();
     }.bind(this));
   },
-  render: function() {
+  view: function(ctrl) {
     var list = [];
-    if (this.state.projectsSnap) {
-      this.state.projectsSnap.forEach(function(p) {
+    if (ctrl.projectsSnap()) {
+      ctrl.projectsSnap().forEach(function(p) {
         p.child('tasks').forEach(function(t) {
-          var taskRef = dao.getTaskRef(p.name(), t.name());
-          list.push(<TaskListItem key={p.name() + '.' + t.name()} task={t.val()} taskRef={taskRef}/>);
+          var tctrl = new TaskListItem.controller(p, t);
+          list.push(TaskListItem.view(tctrl));
         }.bind(this));
       }.bind(this));
     }
-    return <ul className="list-group">{list}</ul>;
+    return m('ul.list-group', list);
   }
-});
+}

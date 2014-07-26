@@ -1,17 +1,24 @@
-/** @jsx React.DOM */
-
 "use strict";
 
-var React = require('react');
+var m = require('mithril');
+var dao = require('./dao');
 
-module.exports = React.createClass({
-  doCheckItem: function(prev) {
-    this.props.taskRef.doComplete(!prev);
+module.exports = {
+  controller: function(projectSnap, taskSnap) {
+    this.task = taskSnap.val();
+    this.completeItem = function(b) {
+      dao.getTaskRef(projectSnap.name(), taskSnap.name()).doComplete(b);
+    }.bind(this);
   },
-  render: function() {
-    var task = this.props.task;
-    return <li className="list-group-item">
-      <input type="checkbox" checked={task.completed} onChange={this.doCheckItem.bind(null, task.completed)}/> {task.description}
-    </li>;
+  view: function(ctrl) {
+    var task = ctrl.task;
+    var taskRef = ctrl.taskRef;
+    return m('li.list-group-item', [
+      m('input[type=checkbox]', {
+        checked: task.completed,
+        onchange: m.withAttr('checked', ctrl.completeItem)
+      }),
+      ' ', task.description
+    ]);
   }
-});
+}

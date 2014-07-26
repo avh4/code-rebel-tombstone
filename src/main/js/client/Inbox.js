@@ -1,85 +1,84 @@
-/** @jsx React.DOM */
-
 "use strict";
 
-var React = require('react');
+var m = require('mithril');
 var Typeahead = require('./Typeahead');
 var dao = require('./dao');
 
-var ProcessCard = React.createClass({
-  getInitialState: function() {
-    return { projects: [], next: undefined };
-  },
-  componentWillMount: function() {
+var ProcessCard = {
+  controller: function() {
+    this.next = m.prop();
+    this.projectsSnap = m.prop([]);
+    this.Typeahead = new Typeahead.controller();
+    this.doSubmit = function() {
+      var p = this.Typeahead.value();
+      dao.doMakeTaskFromInboxItem(this.next(), p);
+      this.Typeahead.clear();
+      return false;
+    }.bind(this);
+    this.doDone = function() {
+      dao.doCompleteInbox(this.next());
+      return false;
+    }.bind(this);
     dao.bindProjects(function(projects) {
-      this.setState({ projectsSnap: projects});
+      this.projectsSnap(projects);
+      m.redraw();
     }.bind(this));
     dao.bindNextInboxItem(function(inboxItem) {
-      this.setState({ next: inboxItem });
+      this.next(inboxItem);
+      m.redraw();
     }.bind(this));
   },
-  doSubmit: function() {
-    var p = this.refs.project.value();
-    dao.doMakeTaskFromInboxItem(this.state.next, p || this.refs.project.text());
-    return false;
-  },
-  doDone: function() {
-    dao.doCompleteInbox(this.state.next);
-    return false;
-  },
-  render: function() {
+  view: function(ctrl) {
+    if (!ctrl.next()) return m('div', '...');
+
     var projects = [];
-    if (this.state.projectsSnap) {
-      this.state.projectsSnap.forEach(function(p) {
+    if (ctrl.projectsSnap()) {
+      ctrl.projectsSnap().forEach(function(p) {
         projects.push({ title: p.val().title, id: p.name() });
       });
     }
-    
-    if (!this.state.next) return <div>...</div>;
-    
-    var next = this.state.next.val();
+
+    var next = ctrl.next().val();
     var title = next.description;
     if (next.href) {
-      title = <a href={next.href} target="_new">{next.description}</a>;
+      title = m('a', { href: next.href, target: '_new'}, next.description);
     }
     var icons = [];
     if (next.type === 'pocket') {
-      icons.push(<img src="pocket.png" width="16"/>)
+      icons.push(m('img', { src: 'pocket.png', width: '16'}));
     }
 
-    return <div className="panel panel-default">
-      <div className="panel-heading">
-        <h3 className="panel-title">{icons} {title}</h3>
-      </div>
-      <div className="panel-body">
-        <p>{next.notes}</p>
-        <form onSubmit={this.doSubmit}>
-          <Typeahead ref="project" placeholder="Project" options={projects} displayKey="title"/>
-          <button className="btn btn-primary">Make Action</button>
-          <button className="btn btn-default" onClick={this.doDone}>Done</button>
-        </form>
-      </div>
-    </div>;
+    return m('div.panel.panel-default', [
+      m('div.panel-heading', m('h3.panel-title', [ icons, ' ', title])),
+      m('div.panel-body', [
+        m('p', next.notes),
+        m('form', {onsubmit: ctrl.doSubmit}, [
+          Typeahead.view(ctrl.Typeahead, 'Project', projects, 'title'),
+          m('button.btn.btn-primary', 'Make Action'),
+          m('button.btn.btn-default', {onclick: ctrl.doDone}, 'Done')
+        ])
+      ])
+    ]);
   }
-});
+}
 
-module.exports = React.createClass({
-  getInitialState: function() {
-    return { inboxCount: null };
-  },
-  componentWillMount: function() {
+module.exports = {
+  controller: function() {
+    this.inboxCount = m.prop();
+    this.ProcessCard = new ProcessCard.controller();
     dao.bindInboxCount(function(count) {
-      this.setState({ inboxCount: count });
+      this.inboxCount(count);
+      m.redraw();
     }.bind(this));
   },
-  render: function() {
+  view: function(ctrl) {
     var message = "It's clean!";
-    if (this.state.inboxCount == null) return <div><ProcessCard/></div>;
-    if (this.state.inboxCount == 0) return <div className="jumbotron"><h1>{message}</h1></div>;
-    
-    return <div>
-      <ProcessCard/>
-      <p>{this.state.inboxCount - 1} more</p>
-    </div>;
+    if (ctrl.inboxCount() == null) return ProcessCard.view(ctrl.ProcessCard);
+    if (ctrl.inboxCount() == 0) return m('div.jumbotron', m('h1', message));
+
+    return m('div', [
+      ProcessCard.view(ctrl.ProcessCard),
+      m('p', [ctrl.inboxCount() - 1, ' more'])
+    ]);
   }
-})
+}

@@ -1,8 +1,6 @@
-/** @jsx React.DOM */
-
 "use strict";
 
-var React = require('react');
+var m = require('mithril');
 var MyProject = require('./MyProject');
 
 var chatRef = new Firebase('https://rebel-tombstone-dev.firebaseio.com');
@@ -16,6 +14,6 @@ var auth = new FirebaseSimpleLogin(chatRef, function(error, user) {
       password: password
     });
   } else {
-    React.renderComponent(<MyProject/>, document.getElementById('root'));
+    m.module(document.getElementById('root'), MyProject);
   }
 });

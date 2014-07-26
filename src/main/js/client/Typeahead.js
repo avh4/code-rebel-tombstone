@@ -1,46 +1,49 @@
-/** @jsx React.DOM */
-
 "use strict";
 
-var React = require('react');
+var m = require('mithril');
 
-module.exports = React.createClass({
-  initTypeahead: function() {
-    var source = new Bloodhound({
-      datumTokenizer: Bloodhound.tokenizers.obj.whitespace(this.props.displayKey),
-      queryTokenizer: Bloodhound.tokenizers.whitespace,
-      local: this.props.options
-    });
-    source.initialize();
-    
-    $(this.getDOMNode()).typeahead('destroy');
-    $(this.getDOMNode()).typeahead({
-      hint: true,
-      highlight: true,
-      minLength: 1
-    },
-    {
-      displayKey: this.props.displayKey,
-      source: source.ttAdapter()
-    }).on('typeahead:selected', function (obj, datum) {
-      this._v = datum;
-    }.bind(this)).on('typeahead:autocompleted', function (obj, datum) {
-      this._v = datum;
-    }.bind(this));
+module.exports = {
+  controller: function() {
+    this.value = m.prop();
+    this.doChange = function(v) {
+      this.value(v);
+    }.bind(this);
+    this.clear = function() {
+      this.value(null);
+    }.bind(this);
   },
-  componentDidMount: function() {
-    this.initTypeahead();
-  },
-  componentDidUpdate: function() {
-    this.initTypeahead();
-  },
-  value: function() {
-    return this._v;
-  },
-  text: function() {
-    return this.refs.input.getDOMNode().value;
-  },
-  render: function() {
-    return <input ref="input" className="form-control" type="text" placeholder={this.props.placeholder}/>;
+  view: function(ctrl, placeholder, choices, displayKey) {
+    return m('input.form-control', {type: 'text', placeholder: placeholder,
+    onchange: m.withAttr('value', ctrl.doChange),
+    config: function(element, isInitialized) {
+      if (!isInitialized) {
+        var source = new Bloodhound({
+          datumTokenizer: Bloodhound.tokenizers.obj.whitespace(displayKey),
+          queryTokenizer: Bloodhound.tokenizers.whitespace,
+          local: choices
+        });
+        source.initialize();
+
+        $(element).typeahead({
+          hint: true,
+          highlight: true,
+          minLength: 1
+        },
+        {
+          displayKey: displayKey,
+          source: source.ttAdapter()
+        }).on('typeahead:selected', function (obj, datum) {
+          m.startComputation();
+          ctrl.value(datum);
+          m.endComputation();
+        }.bind(this)).on('typeahead:autocompleted', function (obj, datum) {
+          m.startComputation();
+          ctrl.value(datum);
+          m.endComputation();
+        }.bind(this));
+      } else if (!ctrl.value()) {
+        $(element).typeahead('val', null);
+      }
+    }});
   }
-});
+}

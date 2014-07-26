@@ -1,7 +1,6 @@
 var gulp = require('gulp');
 var gulpFilter = require('gulp-filter');
 
-var react = require('gulp-react');
 var mocha = require('gulp-mocha');
 
 var paths = {
@@ -13,9 +12,6 @@ gulp.task('test', function() {
   var testFilter = gulpFilter('test/js/**/*.js');
 
   gulp.src([paths.src + '/**/*.js'])
-    // transform jsx to js
-    .pipe(react())
-
     // copy into target
     .pipe(gulp.dest(paths.target))
 
